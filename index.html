@@ -1133,47 +1133,7 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             nav.classList.toggle('flex');
             nav.classList.toggle('flex-col');
   }
-</script>
-
-<!-- 1. АДМИН КИРҮҮ БАСКЫЧЫ ЖАНА МОДАЛДЫК ТЕРЕЗЕ (Скрипттин СЫРТЫНА) -->
-<div class="text-center my-6">
-    <button onclick="openAdminAuth()" class="text-xs text-gray-500 hover:text-amber-500 underline cursor-pointer">
-        🔑 Админ панелге кирүү
-    </button>
-</div>
-
-<div id="admin-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
-    <div class="bg-gray-800 border border-amber-600 rounded-xl p-6 max-w-md w-full shadow-2xl relative">
-        <button onclick="closeAdminModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">✕</button>
-        <h2 class="text-xl font-bold text-amber-500 mb-4 text-center">🎯 Админ системасына кирүү</h2>
-        
-        <div id="admin-login-form" class="space-y-4">
-            <div>
-                <label class="block text-sm text-gray-300 mb-1">Логин:</label>
-                <input type="text" id="admin-user" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none focus:border-amber-500">
-            </div>
-            <div>
-                <label class="block text-sm text-gray-300 mb-1">Сыр сөз (Пароль):</label>
-                <input type="password" id="admin-pass" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none focus:border-amber-500">
-            </div>
-            <button onclick="checkAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded cursor-pointer">
-                Кирүү
-            </button>
-        </div>
-
-        <div id="admin-dashboard" class="hidden space-y-4">
-            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                <span class="text-green-400 font-semibold text-sm">✓ Кирүү ийгиликтүү</span>
-                <button onclick="loadSiteReservations()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded">🔄 Жаңылоо</button>
-            </div>
-            <div class="max-h-80 overflow-y-auto space-y-2" id="site-reservations-list">
-                <p class="text-gray-400 text-sm text-center">Жүктөлүүдө...</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 2. АДМИН ЛОГИКАСЫН 🛠 ӨЗҮНЧӨ СКТРИПТКЕ КОШОБУЗ -->
+<!-- АДМИН ЛОГИКАСЫ (Скрипттин ичине кошулат) -->
 <script>
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "mergen2026";
@@ -1241,6 +1201,44 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         });
     }
 </script>
+
+<!-- АДМИН БАСКЫЧЫ ЖАНА МОДАЛДЫК ТЕРЕЗЕ (Скрипттин СЫРТЫНА, </body> алдына) -->
+<div class="text-center my-6">
+    <button onclick="openAdminAuth()" class="text-xs text-gray-500 hover:text-amber-500 underline cursor-pointer">
+        🔑 Админ панелге кирүү
+    </button>
+</div>
+
+<div id="admin-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
+    <div class="bg-gray-800 border border-amber-600 rounded-xl p-6 max-w-md w-full shadow-2xl relative">
+        <button onclick="closeAdminModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">✕</button>
+        <h2 class="text-xl font-bold text-amber-500 mb-4 text-center">🎯 Админ системасына кирүү</h2>
+        
+        <div id="admin-login-form" class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-300 mb-1">Логин:</label>
+                <input type="text" id="admin-user" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none focus:border-amber-500">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-1">Сыр сөз (Пароль):</label>
+                <input type="password" id="admin-pass" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none focus:border-amber-500">
+            </div>
+            <button onclick="checkAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded cursor-pointer">
+                Кирүү
+            </button>
+        </div>
+
+        <div id="admin-dashboard" class="hidden space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+                <span class="text-green-400 font-semibold text-sm">✓ Кирүү ийгиликтүү</span>
+                <button onclick="loadSiteReservations()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded">🔄 Жаңылоо</button>
+            </div>
+            <div class="max-h-80 overflow-y-auto space-y-2" id="site-reservations-list">
+                <p class="text-gray-400 text-sm text-center">Жүктөлүүдө...</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

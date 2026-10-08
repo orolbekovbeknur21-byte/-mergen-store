@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ky" class="blue">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>МЕРГЕН - Аңчылык жана курал-жарак дүкөнү</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tactical: {
+                            900: '#0d1117',
+                            800: '#161b22',
+                            700: '#21262d',
+                            600: '#30363d',
+                            gold: '#d97706',
+                            goldHover: '#b45309',
+                            accent: '#f59e0b',
+                            red: '#dc2626'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d1117; color: #f3f4f6; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #161b22; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d97706; }
+    </style>
+<!-- Supabase SDK JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-tactical-900 text-gray-100 min-h-screen flex flex-col justify-between selection:bg-tactical-gold selection:text-black">
+
+    <!-- AGE VERIFICATION MODAL -->
+    <div id="age-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md transition-opacity duration-300">
+        <div class="bg-tactical-800 border border-tactical-gold/40 p-6 md:p-8 rounded-xl max-w-lg w-full text-center shadow-2xl mx-4">
+            <div class="w-16 h-16 bg-tactical-gold/20 text-tactical-gold rounded-full flex items-center justify-center mx-auto mb-4 border border-tactical-gold/50 text-2xl font-bold">
+                21+
+            </div>
+            <h2 class="text-2xl font-extrabold text-white mb-2 uppercase tracking-wide">Куракты Ырастоо</h2>
+            <p class="text-gray-300 mb-6 text-sm leading-relaxed">
+                Кыргыз Республикасынын мыйзамдарына ылайык, жарандык курал-жарактарды жана ок-дарыларды көрүү үчүн сиз кеминде <strong>21 жашка</strong> толгон болушуңуз керек.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="confirmAge(true)" class="w-full py-3 bg-tactical-gold hover:bg-tactical-goldHover text-black font-bold rounded-lg transition tracking-wider uppercase text-sm shadow-lg shadow-tactical-gold/20">
+                    Ооба, 21 жаштан аштым
+                </button>
+                <button onclick="confirmAge(false)" class="w-full py-3 bg-tactical-700 hover:bg-tactical-600 text-gray-300 font-bold rounded-lg transition tracking-wider uppercase text-sm">
+                    Чыгуу
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOM NOTIFICATION MODAL -->
+    <div id="notice-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+        <div class="bg-tactical-800 border border-tactical-gold/50 rounded-xl max-w-md w-full p-6 text-center shadow-2xl">
+            <div id="notice-icon" class="w-12 h-12 rounded-full bg-tactical-gold/20 text-tactical-gold flex items-center justify-center mx-auto mb-3 text-xl border border-tactical-gold/40">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h3 id="notice-title" class="text-lg font-bold text-white uppercase mb-2">Маалымат</h3>
+            <p id="notice-message" class="text-xs text-gray-300 mb-5 leading-relaxed whitespace-pre-line"></p>
+            <button id="notice-btn" onclick="closeNoticeModal()" class="w-full bg-tactical-gold hover:bg-tactical-goldHover text-black font-bold py-2.5 rounded-lg text-xs uppercase tracking-wider transition">
+                Жабуу
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="sticky top-0 z-40 bg-tactical-800/95 backdrop-blur-md border-b border-tactical-700 shadow-xl">
+        <!-- Top Disclaimer Bar -->
+        <div class="bg-black/60 text-xs py-1.5 px-4 text-center border-b border-tactical-700/50 flex items-center justify-center gap-2 text-tactical-gold">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>КР ИИМ Лицензиясы талап кылынат. Онлайн сунуштар куралдарды брондоо катары иштейт. Дүкөндөн физикалык текшерүү менен берилет.</span>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20 gap-4">
+                
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-tactical-gold rounded-lg flex items-center justify-center text-black font-extrabold text-xl shadow-lg shadow-tactical-gold/30 group-hover:scale-105 transition">
+                        <i class="fa-solid fa-crosshairs"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black tracking-wider text-white uppercase group-hover:text-tactical-gold transition">МЕРГЕН</span>
+                        <span class="block text-[10px] text-tactical-gold tracking-widest uppercase font-semibold">Аңчылык & Тактика</span>
+                    </div>
+                </a>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-xl mx-6 relative">
+                    <input type="text" id="search-input" onkeyup="filterProducts()" placeholder="Куралдын аты, калибри же бренди боюнча издөө..." 
+                           class="w-full bg-tactical-900 border border-tactical-600 text-white text-sm rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:border-tactical-gold transition placeholder-gray-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-gray-400 text-sm"></i>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleCaliberWidget()" class="hidden sm:flex items-center gap-2 bg-tactical-700 hover:bg-tactical-600 text-tactical-gold border border-tactical-gold/30 px-3 py-2 rounded-lg text-xs font-bold transition">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Калибр Тандагыч</span>
+                    </button>
+
+                    <button onclick="openCartDrawer()" class="relative bg-tactical-700 hover:bg-tactical-600 p-2.5 rounded-lg text-gray-200 transition border border-tactical-600">
+                        <i class="fa-solid fa-shield-halved text-lg"></i>
+                        <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-tactical-gold text-black text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+
+                    <!-- Mobile Menu Button -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden bg-tactical-700 p-2.5 rounded-lg text-gray-300">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="md:hidden pb-3">
+                <div class="relative">
+                    <input type="text" id="search-input-mobile" onkeyup="filterProducts(true)" placeholder="Издөө (мисалы, 7.62, Вепрь)..." 
+                           class="w-full bg-tactical-900 border border-tactical-600 text-white text-sm rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-tactical-gold">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex space-x-1 border-t border-tactical-700/60 py-2.5 overflow-x-auto">
+                <button onclick="filterCategory('all', event)" class="cat-btn active text-xs font-bold px-3.5 py-1.5 rounded-md uppercase transition tracking-wider whitespace-nowrap bg-tactical-gold text-black">Бардыгы</button>
+                <button onclick="filterCategory('rifled', event)" class="cat-btn text-xs font-bold px-3.5 py-1.5 rounded-md uppercase text-gray-300 hover:bg-tactical-700 transition tracking-wider whitespace-nowrap">Сайлуу куралдар</button>
+                <button onclick="filterCategory('smooth', event)" class="cat-btn text-xs font-bold px-3.5 py-1.5 rounded-md uppercase text-gray-300 hover:bg-tactical-700 transition tracking-wider whitespace-nowrap">Жылмакай куралдар</button>
+                <button onclick="filterCategory('airgun', event)" class="cat-btn text-xs font-bold px-3.5 py-1.5 rounded-md uppercase text-gray-300 hover:bg-tactical-700 transition tracking-wider whitespace-nowrap">Пневматика & Травматика</button>
+                <button onclick="filterCategory('ammo', event)" class="cat-btn text-xs font-bold px-3.5 py-1.5 rounded-md uppercase text-gray-300 hover:bg-tactical-700 transition tracking-wider whitespace-nowrap">Ок-дарылар</button>
+                <button onclick="filterCategory('optics', event)" class="cat-btn text-xs font-bold px-3.5 py-1.5 rounded-md uppercase text-gray-300 hover:bg-tactical-700 transition tracking-wider whitespace-nowrap">Оптика & Тюнинг</button>
+                <button onclick="filterCategory('gear', event)" class="cat-btn text-xs font-bold px-3.5 py-1.5 rounded-md uppercase text-gray-300 hover:bg-tactical-700 transition tracking-wider whitespace-nowrap">Экипировка & Кийим</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="relative bg-gradient-to-r from-black via-tactical-800 to-black border-b border-tactical-700 py-12 px-4 overflow-hidden">
+        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#d97706_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10 gap-8">
+            <div class="max-w-2xl text-center md:text-left">
+                <span class="inline-block bg-tactical-gold/20 text-tactical-gold border border-tactical-gold/40 text-xs uppercase px-3 py-1 rounded-full font-bold mb-3 tracking-widest">
+                    Кыргызстандын тоолоруна арналган аңчылык жабдыктары
+                </span>
+                <h1 class="text-3xl md:text-5xl font-extrabold text-white uppercase tracking-tight leading-tight">
+                    Аңчылык Сезонуна Карата <span class="text-tactical-gold">Атайын Арзандатуулар!</span>
+                </h1>
+                <p class="text-gray-400 mt-3 text-sm md:text-base leading-relaxed">
+                    Премиум класстагы сайлуу карабиндер, оптикалык мээлегичтер жана КР мыйзамдарына ылайык тастыкталган бардык зарыл экипировка.
+                </p>
+                <div class="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
+                    <a href="#catalog" class="bg-tactical-gold hover:bg-tactical-goldHover text-black font-bold px-6 py-3 rounded-lg uppercase tracking-wider text-sm transition shadow-lg shadow-tactical-gold/20">
+                        Каталогду Көрүү
+                    </a>
+                    <button onclick="toggleCaliberWidget()" class="bg-tactical-700 hover:bg-tactical-600 text-white font-bold px-6 py-3 rounded-lg uppercase tracking-wider text-sm border border-tactical-600 transition">
+                        Калибр Тандоо
+                    </button>
+                </div>
+            </div>
+            <!-- Tactical Visual Spec Box -->
+            <div class="w-full md:w-auto bg-tactical-900/80 border border-tactical-gold/30 p-5 rounded-xl shadow-2xl backdrop-blur max-w-sm">
+                <div class="flex items-center justify-between border-b border-tactical-700 pb-3 mb-3">
+                    <span class="text-xs text-tactical-gold font-bold uppercase"><i class="fa-solid fa-certificate"></i> Тастыкталган Дүкөн</span>
+                    <span class="text-[10px] bg-green-900/80 text-green-300 px-2 py-0.5 rounded font-mono">КР ИИМ№489</span>
+                </div>
+                <div class="space-y-2 text-xs text-gray-300">
+                    <div class="flex justify-between"><span>Аңчылык куралдары:</span><span class="font-bold text-white">400+ модель</span></div>
+                    <div class="flex justify-between"><span>Ок-дары запасы:</span><span class="font-bold text-white">Толук камсыздалган</span></div>
+                    <div class="flex justify-between"><span>Сервис жана тюнинг:</span><span class="font-bold text-tactical-gold">Бишкек ш.</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALIBER / GAME FINDER WIDGET -->
+    <div id="caliber-widget" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-tactical-800 border-2 border-tactical-gold/50 rounded-xl p-6 shadow-2xl relative">
+            <button onclick="toggleCaliberWidget()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="text-lg font-bold text-tactical-gold uppercase flex items-center gap-2 mb-4">
+                <i class="fa-solid fa-bullseye"></i> Интерактивдүү Калибр жана Курал Тандагыч
+            </h3>
+            <p class="text-xs text-gray-300 mb-4">Аңчылык кылгыңыз келген жаныбарды тандаңыз, тутум сизге сунушталган калибрди эсептеп берет:</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <button onclick="selectGame('goat')" class="game-btn bg-tactical-700 hover:bg-tactical-600 p-3 rounded-lg border border-tactical-600 text-center transition">
+                    <i class="fa-solid fa-mountain text-tactical-gold text-2xl mb-1 block"></i>
+                    <span class="text-xs font-bold block">Тоо теке / Кийик</span>
+                    <span class="text-[10px] text-gray-400">Узак аралык (300m+)</span>
+                </button>
+                <button onclick="selectGame('boar')" class="game-btn bg-tactical-700 hover:bg-tactical-600 p-3 rounded-lg border border-tactical-600 text-center transition">
+                    <i class="fa-solid fa-paw text-tactical-gold text-2xl mb-1 block"></i>
+                    <span class="text-xs font-bold block">Каман / Элик</span>
+                    <span class="text-[10px] text-gray-400">Орто аралык (100-200m)</span>
+                </button>
+                <button onclick="selectGame('birds')" class="game-btn bg-tactical-700 hover:bg-tactical-600 p-3 rounded-lg border border-tactical-600 text-center transition">
+                    <i class="fa-solid fa-dove text-tactical-gold text-2xl mb-1 block"></i>
+                    <span class="text-xs font-bold block">Кеклик / Өрдөк</span>
+                    <span class="text-[10px] text-gray-400">Жакын аралык (30-60m)</span>
+                </button>
+                <button onclick="selectGame('predator')" class="game-btn bg-tactical-700 hover:bg-tactical-600 p-3 rounded-lg border border-tactical-600 text-center transition">
+                    <i class="fa-solid fa-dog text-tactical-gold text-2xl mb-1 block"></i>
+                    <span class="text-xs font-bold block">Бөрү / Түлкү</span>
+                    <span class="text-[10px] text-gray-400">Ылдам аралык (150-300m)</span>
+                </button>
+            </div>
+
+            <div id="game-recommendation" class="hidden bg-tactical-900 border border-tactical-gold/30 p-4 rounded-lg text-xs"></div>
+        </div>
+    </div>
+
+    <!-- MAIN CATALOG LAYOUT -->
+    <main id="catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- SIDEBAR FILTERS -->
+            <aside class="w-full lg:w-64 flex-shrink-0">
+                <div class="bg-tactical-800 border border-tactical-700 p-5 rounded-xl sticky top-28 space-y-6">
+                    <div class="flex items-center justify-between border-b border-tactical-700 pb-3">
+                        <h3 class="font-extrabold text-white uppercase text-sm tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-tactical-gold"></i> Чыпкалар (Фильтр)
+                        </h3>
+                        <button onclick="resetFilters()" class="text-[11px] text-tactical-gold hover:underline">Тазалоо</button>
+                    </div>
+
+                    <!-- Caliber Filter -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-300 mb-2">Калибри:</label>
+                        <div class="space-y-1.5 text-xs text-gray-300">
+                            <label class="flex items-center gap-2 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="7.62x39" onchange="filterProducts()" class="caliber-checkbox rounded bg-tactical-900 border-tactical-600 text-tactical-gold focus:ring-0">
+                                <span>7.62x39 mm</span>
+                            </label>
+                            <label class="flex items-center gap-2 hover:text-white cursor-pointer">
+                                <input type="checkbox" value=".308 Win" onchange="filterProducts()" class="caliber-checkbox rounded bg-tactical-900 border-tactical-600 text-tactical-gold focus:ring-0">
+                                <span>.308 Win (7.62x51)</span>
+                            </label>
+                            <label class="flex items-center gap-2 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="12/76" onchange="filterProducts()" class="caliber-checkbox rounded bg-tactical-900 border-tactical-600 text-tactical-gold focus:ring-0">
+                                <span>12/76 (12 Gauge)</span>
+                            </label>
+                            <label class="flex items-center gap-2 hover:text-white cursor-pointer">
+                                <input type="checkbox" value="9x19" onchange="filterProducts()" class="caliber-checkbox rounded bg-tactical-900 border-tactical-600 text-tactical-gold focus:ring-0">
+                                <span>9x19 mm Parabellum</span>
+                            </label>
+                            <label class="flex items-center gap-2 hover:text-white cursor-pointer">
+                                <input type="checkbox" value=".223 Rem" onchange="filterProducts()" class="caliber-checkbox rounded bg-tactical-900 border-tactical-600 text-tactical-gold focus:ring-0">
+                                <span>.223 Rem (5.56x45)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Brand Filter -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-300 mb-2">Өндүрүүчү / Бренд:</label>
+                        <select id="brand-select" onchange="filterProducts()" class="w-full bg-tactical-900 border border-tactical-600 text-white text-xs rounded-lg p-2.5 focus:border-tactical-gold">
+                            <option value="all">Бардык өндүрүүчүлөр</option>
+                            <option value="Калашников">Калашников Концерни</option>
+                            <option value="Байкал">Байкал (Ижевск)</option>
+                            <option value="Бенелли">Benelli (Италия)</option>
+                            <option value="Застава">Zastava Arms</option>
+                            <option value="Вектор">Vector Optics</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Filter -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-300 mb-2">Максималдуу баасы (Сом):</label>
+                        <input type="range" id="price-range" min="1000" max="350000" step="5000" value="350000" oninput="updatePriceLabel(this.value)" onchange="filterProducts()" class="w-full accent-tactical-gold bg-tactical-900">
+                        <div class="flex justify-between text-[11px] text-gray-400 mt-1 font-mono">
+                            <span>1 000 сом</span>
+                            <span id="price-display" class="text-tactical-gold font-bold">350 000 сом</span>
+                        </div>
+                    </div>
+
+                    <!-- Legal Badge Filter -->
+                    <div class="pt-2 border-t border-tactical-700">
+                        <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer">
+                            <input type="checkbox" id="license-only" onchange="filterProducts()" class="rounded bg-tactical-900 border-tactical-600 text-tactical-gold">
+                            <span>Уруксат кагазы талап кылынгандар гана</span>
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- PRODUCT GRID SECTION -->
+            <section class="flex-1">
+                <!-- Sorting Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-tactical-800 border border-tactical-700 p-3.5 rounded-xl mb-6 gap-3">
+                    <span class="text-xs text-gray-400 font-medium">
+                        Табылган товарлар: <strong id="product-count" class="text-white">0</strong>
+                    </span>
+                    <div class="flex items-center gap-2 text-xs text-gray-300 w-full sm:w-auto justify-end">
+                        <span>Сорттоо:</span>
+                        <select id="sort-select" onchange="filterProducts()" class="bg-tactical-900 border border-tactical-600 text-white rounded p-1.5 focus:outline-none focus:border-tactical-gold text-xs">
+                            <option value="default">Демейки</option>
+                            <option value="low">Баасы: Төмөндөн жогоруга</option>
+                            <option value="high">Баасы: Жогорудан төмөнгө</option>
+                            <option value="name">Аты боюнча (А-Я)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden text-center py-16 bg-tactical-800/50 rounded-xl border border-dashed border-tactical-700">
+                    <i class="fa-solid fa-shield-cat text-4xl text-gray-600 mb-3"></i>
+                    <h3 class="text-lg font-bold text-gray-300">Тилекке каршы, эч нерсе табылган жок</h3>
+                    <p class="text-xs text-gray-500 mt-1">Издөө суроосун же фильтр параметрлерин өзгөртүп көрүңүз.</p>
+                    <button onclick="resetFilters()" class="mt-4 bg-tactical-gold text-black text-xs font-bold px-4 py-2 rounded-lg">Фильтрди Ыргытуу</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-tactical-800 border border-tactical-gold/40 rounded-xl max-w-2xl w-full p-6 relative shadow-2xl my-8">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div id="product-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- RESERVATION / CART DRAWER -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex justify-end">
+        <div class="bg-tactical-800 w-full max-w-md h-full shadow-2xl flex flex-col border-l border-tactical-700">
+            <div class="p-4 border-b border-tactical-700 flex justify-between items-center bg-tactical-900">
+                <h3 class="font-extrabold text-white uppercase text-sm tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-tactical-gold"></i> Тандалган Брондор
+                </h3>
+                <button onclick="closeCartDrawer()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+
+            <div class="p-4 border-t border-tactical-700 bg-tactical-900 space-y-3">
+                <div class="flex justify-between text-sm font-bold">
+                    <span>Жалпы суммасы:</span>
+                    <span id="cart-total" class="text-tactical-gold font-mono text-base">0 сом</span>
+                </div>
+                <p class="text-[10px] text-gray-400 leading-tight">
+                    * Заказды ырастоодо сиз Дүкөнгө келип, КР ИИМ тарабынан берилген курал сатып алуу уруксатнамасын (лицензиясын) көрсөтүшүңүз керек.
+                </p>
+                <button onclick="openCheckoutModal()" class="w-full bg-tactical-gold hover:bg-tactical-goldHover text-black font-extrabold py-3 rounded-lg uppercase tracking-wider text-xs transition shadow-lg shadow-tactical-gold/20">
+                    Брондоону Тапшыруу (Келип алуу)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT / LICENSE UPLOAD MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="bg-tactical-800 border border-tactical-gold/40 rounded-xl max-w-lg w-full p-6 relative shadow-2xl my-8">
+            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <h3 class="text-lg font-bold text-white uppercase tracking-wider mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-file-signature text-tactical-gold"></i> Брондоону Каттоо
+            </h3>
+            <p class="text-xs text-gray-400 mb-4">Бул куралды дүкөндөн дароо алып кетүү үчүн маалыматтарды киргизиңиз:</p>
+
+            <form id="checkout-form" onsubmit="handleCheckout(event)" class="space-y-4 text-xs">
+                <div>
+                    <label class="block text-gray-300 font-bold mb-1">Толук Аты-Жөнүңүз (ФИО):</label>
+                    <input type="text" required placeholder="Мисалы: Асанов Бакыт " class="w-full bg-tactical-900 border border-tactical-600 rounded p-2.5 text-white focus:border-tactical-gold">
+                </div>
+                <div>
+                    <label class="block text-gray-300 font-bold mb-1">Телефон Номериңиз:</label>
+                    <input type="tel" required placeholder="+996 550 000 000" class="w-full bg-tactical-900 border border-tactical-600 rounded p-2.5 text-white focus:border-tactical-gold">
+                </div>
+                <div>
+                    <label class="block text-gray-300 font-bold mb-1">Алып кетүүчү Дүкөн филиалы:</label>
+                    <select required class="w-full bg-tactical-900 border border-tactical-600 rounded p-2.5 text-white focus:border-tactical-gold">
+                        <option value="bishkek_center">Бишкек ш., Турусбеков кочосу 113. ("МЕРГЕН" Башкы Дүкөн)</option>
+                        <option value="osh_branch">Ош ш., Курманжан Датка көчөсү 45</option>
+                        <option value="karakol_branch">Каракол ш., Жаштар көчөсү 12</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-300 font-bold mb-1">КР ИИМ Лицензия/Уруксат кагаз номери:</label>
+                    <input type="text" required placeholder="Мисалы: ЛК-№123456" class="w-full bg-tactical-900 border border-tactical-600 rounded p-2.5 text-white focus:border-tactical-gold font-mono">
+                </div>
+                <div>
+                    <label class="block text-gray-300 font-bold mb-1">Уруксат кагазынын сүрөтү (Милдеттүү эмес, процести ылдамдатат):</label>
+                    <input type="file" accept="image/*" class="w-full bg-tactical-900 border border-tactical-600 rounded p-2 text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-tactical-700 file:text-tactical-gold hover:file:bg-tactical-600">
+                </div>
+
+                <div class="pt-2 border-t border-tactical-700">
+                    <button type="submit" class="w-full bg-tactical-gold hover:bg-tactical-goldHover text-black font-bold py-3 rounded-lg uppercase tracking-wider text-xs shadow-lg transition">
+                        Брондоону Тапшыруу
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-tactical-700 pt-10 pb-6 text-xs text-gray-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <div class="w-7 h-7 bg-tactical-gold rounded flex items-center justify-center text-black font-black">
+                        <i class="fa-solid fa-crosshairs text-xs"></i>
+                    </div>
+                    <span class="text-lg font-black text-white uppercase tracking-wider">МЕРГЕН</span>
+                </div>
+                <p class="text-gray-500 leading-relaxed">
+                    Кыргызстандагы эң ири аңчылык, балык уулоо жана тактикалык жабдыктар каталогу. Бардык продукция тастыкталган.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-bold text-white uppercase tracking-wider mb-3 text-sm">Бөлүмдөр</h4>
+                <ul class="space-y-2">
+                    <li><a href="#catalog" onclick="filterCategory('rifled', event)" class="hover:text-tactical-gold transition">Сайлуу куралдар</a></li>
+                    <li><a href="#catalog" onclick="filterCategory('smooth', event)" class="hover:text-tactical-gold transition">Жылмакай куралдар</a></li>
+                    <li><a href="#catalog" onclick="filterCategory('ammo', event)" class="hover:text-tactical-gold transition">Ок-дарылар</a></li>
+                    <li><a href="#catalog" onclick="filterCategory('optics', event)" class="hover:text-tactical-gold transition">Оптика жана Тюнинг</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white uppercase tracking-wider mb-3 text-sm">Мыйзам жана Уруксат</h4>
+                <ul class="space-y-2 text-gray-500">
+                    <li>КР ИИМ Мыйзамдары</li>
+                    <li>Курал алуу нускамасы</li>
+                    <li>Сейф талаптары</li>
+                    <li>Тир жана Сервис борбору</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-white uppercase tracking-wider mb-3 text-sm">Байланыш</h4>
+                <p class="mb-2"><i class="fa-solid fa-location-dot text-tactical-gold mr-2"></i>Бишкек ш., Турусбеков кочосу 113.</p>
+                <p class="mb-2"><i class="fa-solid fa-phone text-tactical-gold mr-2"></i>+996 (312) 55-00-55</p>
+                <p><i class="fa-solid fa-clock text-tactical-gold mr-2"></i>Иштөө убактысы: 09:00 - 19:00 (Дүйш-Ишем)</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 border-t border-tactical-800 pt-4 flex flex-col md:flex-row justify-between items-center text-gray-600 text-[11px] gap-2">
+            <p>&copy; 2026 "МЕРГЕН" Аңчылык дүкөнү. Бардык укуктар корголгон.</p>
+            <p class="text-gray-500">Эскертүү: Сайттагы баалар маалымат катары берилген жана оферта болуп саналбайт.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+const SUPABASE_URL = 'https://nrnwbntzhvbqcmrwkrfy.supabase.co/rest/v1/';
+const SUPABASE_KEY = 'sb_publishable_uk6A6w4jodxnR13FSxdmHg_1eDqQyTu';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Products Database
+        const products = [
+            {
+                id: 1,
+                title: "Вепрь-308 (ВПО-127) Карабин",
+                category: "rifled",
+                brand: "Калашников",
+                caliber: ".308 Win",
+                price: 125000,
+                badge: "Атайын сунуш",
+                image: "https://img.air-gun.ru/images/average/69893.webp",
+                requiresLicense: true,
+                description: "Тоолуу шарттарда кийик, теке жана каман уулоого ылайыкталган ишенимдүү сайлуу карабин. Бүктөлүүчү приклад жана Пикатинни планкасы бар.",
+                specs: { "Калибр": ".308 Win (7.62x51)", "Ствол узундугу": "520 мм", "Ок баткыч": "10 ок", "Салмагы": "4.3 кг" }
+            },
+            {
+                id: 2,
+                title: "Benelli Argo E Comforttech",
+                category: "rifled",
+                brand: "Бенелли",
+                caliber: ".308 Win",
+                price: 285000,
+                badge: "Премиум",
+                image: "https://fieldsportsmalta.com/wp-content/uploads/2015/04/01_59-600x600.jpg",
+                requiresLicense: true,
+                description: "Италиялык белгилүү полуавтомат карабин. Артка тебүүнү азайтуучу Comforttech системасы менен жабдылган.",
+                specs: { "Калибр": ".308 Win", "Өндүрүлгөн": "Италия", "Ствол": "Криогендик", "Салмагы": "3.25 кг" }
+            },
+            {
+                id: 3,
+                title: "Zastava M70 PS Карабин",
+                category: "rifled",
+                brand: "Застава",
+                caliber: ".308 Win",
+                price: 110000,
+                badge: "Жаңылык",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbZBIxFr76tmmGNwOPVknC9t-bB6Litm6bwZ6x8gtn7A&s=10",
+                requiresLicense: true,
+                description: "Сербияда өндүрүлгөн, Маузер системасындагы жогорку тактыктагы болтовый карабин. Пластик прикладу бышык жана тоо шарттарына туруктуу.",
+                specs: { "Калибр": ".308 Win", "Ствол узундугу": "560 мм", "Ок баткыч": "5 ок", "Салмагы": "3.6 кг" }
+            },
+            {
+                id: 4,
+                title: "Сайга-12 ИСП.030 Жылмакай Курал",
+                category: "smooth",
+                brand: "Калашников",
+                caliber: "12/76",
+                price: 98000,
+                badge: "Бестселлер",
+                image: "https://img.ohotaktiv.ru/upload/iblock/72c/5qj2vh62mmlddcchyzt7gzupn6joq4ix.webp",
+                requiresLicense: true,
+                description: "12 калибрдеги тактикалык эң таанымал полуавтомат курал. Ылдам атуу жана өзүн коргоо, аңчылык үчүн идеалдуу.",
+                specs: { "Калибр": "12/76 (12 Gauge)", "Патронник": "76 мм", "Ок баткыч": "8 ок", "Салмагы": "3.8 кг" }
+            },
+            {
+                id: 5,
+                title: "МР-27М ЭК Бос Чос 12 Калибр",
+                category: "smooth",
+                brand: "Байкал",
+                caliber: "12/76",
+                price: 52000,
+                badge: "Классика",
+                image: "https://12kalibr.com/wa-data/public/shop/products/26/88/8826/images/3353/3353.0x460@2x.jpg",
+                requiresLicense: true,
+                description: "Эки стволдуу вертикалка классикалык аңчылык куралы. Токойдо жана өрдөк уулоодо ишенимдүү өнөктөш.",
+                specs: { "Калибр": "12/76", "Ствол узундугу": "725 мм", "Механизм": "Эжектор", "Материал": "Жангак жыгачы" }
+            },
+            {
+                id: 6,
+                title: "Benelli Super Black Eagle III",
+                category: "smooth",
+                brand: "Бенелли",
+                caliber: "12/76",
+                price: 310000,
+                badge: "Премиум",
+                image: "https://www.hobbi.gr/images/cached/700x700-karampina-benelli-super-black-eagle-3-ai-cerakote-fde-max-7--pr--55274.png",
+                requiresLicense: true,
+                description: "Суу канаттууларына аңчылык кылуу үчүн дүйнөдөгү эң мыкты полуавтоматтардын бири. Инерциялык система менен иштейт.",
+                specs: { "Калибр": "12/89 Super Magnum", "Өндүрүлгөн": "Италия", "Ок баткыч": "4+1 ок", "Салмагы": "3.15 кг" }
+            },
+            {
+                id: 7,
+                title: "Патрон БПЗ 7.62x39 FMJ (20 даана)",
+                category: "ammo",
+                brand: "Байкал",
+                caliber: "7.62x39",
+                price: 2500,
+                badge: "Запас бар",
+                image: "https://img.ohotaktiv.ru/upload/iblock/a39/ixj1xibj0dueryx3zd6jftd8vcblu86i.webp",
+                requiresLicense: true,
+                description: "АК/СКS карабиндери үчүн оболочечный 7.62x39 калибрдеги патрондор. Машыгуу жана аңчылык үчүн.",
+                specs: { "Ок салмагы": "8.0 грамм", "Ылдамдыгы": "775 м/с", "Таңгак": "20 даана" }
+            },
+            {
+                id: 8,
+                title: "Патрон БПЗ .308 Win SP (20 даана)",
+                category: "ammo",
+                brand: "Байкал",
+                caliber: ".308 Win",
+                price: 3800,
+                badge: "Запас бар",
+                image: "https://www.huntworld.ru/upload/iblock/435/patron_308win_bpz_sp_10_9_stal_latunir_1_20.jpeg",
+                requiresLicense: true,
+                description: "Полуоболочечный (SP) экспансивдүү ок. Чоң айбанаттарды (теке, каман, марал) уулоо үчүн жогорку токтотуучу күчкө ээ.",
+                specs: { "Ок салмагы": "10.9 грамм", "Тиби": "SP (Soft Point)", "Таңгак": "20 даана" }
+            },
+            {
+                id: 9,
+                title: "Патрон Главпатрон 12/70 Дробь №3 (25 даана)",
+                category: "ammo",
+                brand: "Байкал",
+                caliber: "12/76",
+                price: 2200,
+                badge: "Аңчылык",
+                image: "https://cdn.kalashnikov.market/product-images/7321f277-627e-4fd6-a2e4-e1ec6644c2da",
+                requiresLicense: true,
+                description: "Өрдөк, кеклик жана коён уулоого арналган 12 калибрдеги сапаттуу патрондор.",
+                specs: { "Дробь номери": "№3 (3.5 мм)", "На навеска": "32 грамм", "Таңгак": "25 даана" }
+            },
+            {
+                id: 10,
+                title: "Vector Optics Continental 3-18x50 HD",
+                category: "optics",
+                brand: "Вектор",
+                caliber: "Универсал",
+                price: 48000,
+                badge: "Оптика",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJIvlkPvbn3TpicpfqSzdDhrMJ64bbFfiJLDvzg9oHmw&s=10",
+                requiresLicense: false,
+                description: "Алыс аралыкка атууга арналган немис айнеги бар профессионалдык оптический прицел. Ылайыктуу жарыктандыруучу торчо.",
+                specs: { "Чоңойтуу": "3-18x", "Объектив": "50 мм", "Торчо": "Tactical VEC-T2", "Суу өтпөстүгү": "IPX6" }
+            },
+            {
+                id: 11,
+                title: "Коллиматордук Прицел Vector Optics Frenzy 1x22",
+                category: "optics",
+                brand: "Вектор",
+                caliber: "Универсал",
+                price: 14500,
+                badge: "Хит",
+                image: "https://vectoroptics.ru/image/cache/catalog/Products/Red-dots/01085/Vector-Optics-Frenzy-Plus-1x26x32QD-2-1000x1000.png",
+                requiresLicense: false,
+                description: "Жылмакай жана сайлуу куралдарга ылайыктуу чакан коллиматор. Жакын аралыкта ылдам мээлеп атууга арналган.",
+                specs: { "Точка өлчөмү": "3 MOA", "Жарык деңгээли": "11 режим", "Батaрея": "CR2032", "Салмагы": "56 гр" }
+            },
+            {
+                id: 12,
+                title: "Тепловизордук Прицел Guide TS445",
+                category: "optics",
+                brand: "Вектор",
+                caliber: "Универсал",
+                price: 165000,
+                badge: "Тепловизор",
+                image: "https://www.pergam.ru/img/products/super/img_0369-edit.jpg",
+                requiresLicense: false,
+                description: "Түнкүсүн жана туманда аңчылык кылууга арналган жогорку тактыктагы тепловизор. Табылуу аралыгы 1800 метрге чейин.",
+                specs: { "Матрица": "400x300", "Объектив": "45 мм", "Аралык": "1800 м", "Экран": "OLED" }
+            },
+            {
+                id: 13,
+                title: "МР-654К Макаров Пневматикалык Пистолет",
+                category: "airgun",
+                brand: "Байкал",
+                caliber: "4.5 mm",
+                price: 18500,
+                badge: "Уруксатсыз",
+                image: "https://basket-10.wbbasket.ru/vol1479/part147937/147937982/images/big/1.webp",
+                requiresLicense: false,
+                description: "Болоттон жасалган оригиналдуу Макаров пистолетинин толук көчүрмөсү. CO2 баллончиктери менен иштейт.",
+                specs: { "Калибр": "4.5 мм BB", "Кубаттуулугу": "< 3 Дж", "Материал": "Курал болот", "Салмагы": "730 гр" }
+            },
+            {
+                id: 14,
+                title: "МР-512С Пневматикалык Винтовка",
+                category: "airgun",
+                brand: "Байкал",
+                caliber: "4.5 mm",
+                price: 12500,
+                badge: "Машыгуу",
+                image: "https://sniper.by/upload/iblock/26f/0bnk18619zy42wh6bbia943j25s4zrqm.jpg",
+                requiresLicense: false,
+                description: "Классикалык переломка пневматика винтовкасы. Атууну үйрөнүү жана көңүл ачуу үчүн эң жакшы тандоо.",
+                specs: { "Калибр": "4.5 мм (.177)", "Ылдамдыгы": "150 м/с", "Приклад": "Пластик", "Салмагы": "3.0 кг" }
+            },
+            {
+                id: 15,
+                title: "Hatsan Striker Edge 1000X",
+                category: "airgun",
+                brand: "Застава",
+                caliber: "4.5 mm",
+                price: 21000,
+                badge: "Кубаттуу",
+                image: "https://img.ohotaktiv.ru/upload/iblock/3c5/ce49qz485rd4cxx0jqi1wzdywy66rakp.webp",
+                requiresLicense: false,
+                description: "Жогорку ылдамдыктагы газопружиналуу пневматика винтовкасы. Жангак жыгачынан жасалган кооз прикладу бар.",
+                specs: { "Калибр": "4.5 мм", "Ылдамдыгы": "305 м/с", "Приклад": "Жангак жыгачы", "Салмагы": "3.2 кг" }
+            },
+            {
+                id: 16,
+                title: "Тактикалык Аңчылык Рюкзагы 45L",
+                category: "gear",
+                brand: "Вектор",
+                caliber: "-",
+                price: 6500,
+                badge: "Аксессуар",
+                image: "https://images.prom.ua/4154576870_w640_h2048_aptava.png?fresh=1&PIMAGE_ID=4154576870",
+                requiresLicense: false,
+                description: "Суу өткөрбөгөн Кордура материалынан жасалган, курал бекитүүчү атайын боолору бар рюкзак.",
+                specs: { "Көлөмү": "45 литр", "Материал": "Cordura 1000D", "Түсү": "Multicam / Олива" }
+            },
+            {
+                id: 17,
+                title: "Курал Сейфи Оружейный (2 куралга)",
+                category: "gear",
+                brand: "Байкал",
+                caliber: "-",
+                price: 18000,
+                badge: "Милдеттүү",
+                image: "https://imperia.kg/image/cache/catalog/dombytsad/seyfy/promet/oruzhejnyesejfy/aiko-berkut/aikoberkut-3-1000x1000.png",
+                requiresLicense: false,
+                description: "КР ИИМ талаптарына толук жооп берген 2 мм болоттон жасалган сейф. Патрондор үчүн өзүнчө трейзери бар.",
+                specs: { "Бийиктиги": "1300 мм", "Калыңдыгы": "2 мм болот", "Кулпу": "2 коопсуздук кулпусу", "Салмагы": "24 кг" }
+            },
+            {
+                id: 18,
+                title: "Активдүү Наушник Earmor M31 MOD3",
+                category: "gear",
+                brand: "Вектор",
+                caliber: "-",
+                price: 8500,
+                badge: "Коргоо",
+                image: "https://lynxgear.lv/images/stories/virtuemart/product/wol_pl_Earmor-Hearing-Protection-Earmuff-with-AUX-Input-M31-PLUS-Black-M31-BK-PLUS-16769_1.jpg",
+                requiresLicense: false,
+                description: "Атуу учурундагы катуу добушту (82dB жогору) автоматтык түрдө басып, акырын чыккан үндөрдү күчөтүп угузуучу кулакчын.",
+                specs: { "Басуу деңгээли": "NRR 22", "Азыктануу": "2xAAA", "Суу коргоо": "IPX-5", "Салмагы": "350 гр" }
+            },
+            {
+                id: 19,
+                title: "Сайга-9 (9x19) Карабин",
+                category: "rifled",
+                brand: "Калашников",
+                caliber: "9x19",
+                price: 92000,
+                badge: "Хит",
+                image: "https://img.air-gun.ru/images/big/84782.webp",
+                requiresLicense: true,
+                description: "9x19 мм калибриндеги тапанчалык патрон менен атуучу тактикалык карабин. Спорттук атуу жана өзүн коргоо үчүн абдан популярдуу.",
+                specs: { "Калибр": "9x19 mm Parabellum", "Ствол узундугу": "367 мм", "Ок баткыч": "10/30 ок", "Салмагы": "3.1 кг" }
+            },
+            {
+                id: 20,
+                title: "Glock 17 Gen5 Травматикалык / Спортивный",
+                category: "rifled",
+                brand: "Застава",
+                caliber: "9x19",
+                price: 185000,
+                badge: "Премиум",
+                image: "https://img.air-gun.ru/images/big/136475.webp",
+                requiresLicense: true,
+                description: "Дүйнөгө белгилүү Австриялык пистолет. Спорттук тирде атуу жана тиешелүү уруксат кагазы бар жарандар үчүн.",
+                specs: { "Калибр": "9x19 mm", "Ок баткыч": "17 ок", "Рама": "Полимер", "Салмагы": "625 гр" }
+            },
+            {
+                id: 21,
+                title: "Патрон БПЗ 9x19 FMJ (50 даана)",
+                category: "ammo",
+                brand: "Байкал",
+                caliber: "9x19",
+                price: 2800,
+                badge: "Запас бар",
+                image: "https://img.ohotaktiv.ru/upload/iblock/175/qbfe4aer17znhffld99pc1xoxbp9nfdt.webp",
+                requiresLicense: true,
+                description: "9x19 mm калибрдеги пистолеттер жана Сайга-9 карабин үчүн латун капталган оболочечный патрондор.",
+                specs: { "Ок салмагы": "7.46 грамм", "Ылдамдыгы": "350 м/с", "Таңгак": "50 даана" }
+            },
+            {
+                id: 22,
+                title: "Вепрь-15 (ВПО-140 / AR-15) Карабин",
+                category: "rifled",
+                brand: "Калашников",
+                caliber: ".223 Rem",
+                price: 195000,
+                badge: "Тактикалык",
+                image: "https://vistrel.club/upload/iblock/294/karabin_vepr_15.jpeg",
+                requiresLicense: true,
+                description: "Америкалык AR-15 платформасындагы .223 Rem калибриндеги натыйжалуу жана так атуучу карабин.",
+                specs: { "Калибр": ".223 Rem (5.56x45)", "Ствол узундугу": "420 мм", "Ок баткыч": "10 ок", "Салмагы": "3.2 кг" }
+            },
+            {
+                id: 23,
+                title: "Сайга-MK ИСП.33 (.223 Rem) Карабин",
+                category: "rifled",
+                brand: "Калашников",
+                caliber: ".223 Rem",
+                price: 88000,
+                badge: "Бестселлер",
+                image: "https://img.air-gun.ru/images/big/84307/161122693310072.webp",
+                requiresLicense: true,
+                description: "АК-102 базасында жасалган чакан, жеңил карабин. Түлкү, бөрү жана чакан айбанаттарга аңчылык кылууга идеалдуу.",
+                specs: { "Калибр": ".223 Rem", "Ствол узундугу": "336 мм", "Приклад": "Бүктөлмө", "Салмагы": "3.2 кг" }
+            },
+            {
+                id: 24,
+                title: "Патрон БПЗ .223 Rem FMJ (20 даана)",
+                category: "ammo",
+                brand: "Байкал",
+                caliber: ".223 Rem",
+                price: 2600,
+                badge: "Запас бар",
+                image: "https://hft.ru/upload/thumbs/source/productimage/image/5702401b67bc2_5eb42e09a16a5.jpeg",
+                requiresLicense: true,
+                description: ".223 Rem (5.56x45) калибриндеги карабиндер үчүн оболочечный машыгуу жана аңчылык патрону.",
+                specs: { "Ок салмагы": "4.0 грамм", "Ылдамдыгы": "890 м/с", "Таңгак": "20 даана" }
+            }
+        ];
+
+        // Global State
+        let currentCategory = 'all';
+        let cart = [];
+
+        // App Init
+        window.onload = function() {
+            renderProducts(products);
+            updateCartUI();
+        };
+
+        // Notice Modal Handler
+        function showNotice(title, message, iconClass = 'fa-circle-info', callback = null) {
+            document.getElementById('notice-title').innerText = title;
+            document.getElementById('notice-message').innerText = message;
+            document.getElementById('notice-icon').innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+            
+            const btn = document.getElementById('notice-btn');
+            btn.onclick = function() {
+                closeNoticeModal();
+                if (typeof callback === 'function') callback();
+            };
+            
+            document.getElementById('notice-modal').classList.remove('hidden');
+        }
+
+        function closeNoticeModal() {
+            document.getElementById('notice-modal').classList.add('hidden');
+        }
+
+        // Age Verification Logic
+        function confirmAge(isAdult) {
+            if (isAdult) {
+                document.getElementById('age-modal').classList.add('hidden');
+            } else {
+                showNotice(
+                    "Кирүүгө болбойт", 
+                    "Кечиресиз, 21 жашка толо элек жарандарга курал-жарак каталогун көрүүгө мыйзам тарабынан тыюу салынат.", 
+                    "fa-triangle-exclamation",
+                    function() { window.location.href = "https://www.google.com"; }
+                );
+            }
+        }
+
+        // Render Product Grid
+        function renderProducts(items) {
+            const grid = document.getElementById('product-grid');
+            const empty = document.getElementById('empty-state');
+            document.getElementById('product-count').innerText = items.length;
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            grid.innerHTML = items.map(product => `
+                <div class="bg-tactical-800 border border-tactical-700 hover:border-tactical-gold/60 rounded-xl overflow-hidden shadow-lg transition duration-300 flex flex-col justify-between group">
+                    <div>
+                        <!-- Image Container -->
+                        <div class="relative h-48 bg-black/50 overflow-hidden cursor-pointer" onclick="openProductModal(${product.id})">
+                            <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-2 left-2 bg-tactical-gold text-black font-extrabold text-[10px] px-2.5 py-1 rounded uppercase tracking-wider shadow">
+                                ${product.badge}
+                            </span>
+                            ${product.requiresLicense ? `
+                                <span class="absolute top-2 right-2 bg-tactical-red/90 text-white font-bold text-[9px] px-2 py-1 rounded flex items-center gap-1">
+                                    <i class="fa-solid fa-certificate"></i> Лицензия
+                                </span>
+                            ` : ''}
+                        </div>
+
+                        <!-- Info -->
+                        <div class="p-4">
+                            <div class="text-[10px] text-tactical-gold font-bold uppercase tracking-wider mb-1">
+                                ${product.brand} • <span class="text-gray-400">${product.caliber}</span>
+                            </div>
+                            <h3 onclick="openProductModal(${product.id})" class="text-sm font-bold text-white hover:text-tactical-gold transition cursor-pointer line-clamp-2 mb-2">
+                                ${product.title}
+                            </h3>
+                            <p class="text-xs text-gray-400 line-clamp-2 mb-4">
+                                ${product.description}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Footer / Price / Actions -->
+                    <div class="p-4 border-t border-tactical-700/60 bg-tactical-900/40 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-500 block uppercase">Баасы:</span>
+                            <span class="text-lg font-black text-tactical-gold font-mono">${product.price.toLocaleString()} сом</span>
+                        </div>
+                        <button onclick="addToCart(${product.id})" class="bg-tactical-700 hover:bg-tactical-gold hover:text-black text-tactical-gold p-2.5 rounded-lg transition border border-tactical-gold/30">
+                            <i class="fa-solid fa-cart-plus text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtering Logic
+        function filterProducts(isMobile = false) {
+            const query = (isMobile 
+                ? document.getElementById('search-input-mobile').value 
+                : document.getElementById('search-input').value).toLowerCase();
+            
+            const maxPrice = parseInt(document.getElementById('price-range').value);
+            const brand = document.getElementById('brand-select').value;
+            const licenseOnly = document.getElementById('license-only').checked;
+            const sort = document.getElementById('sort-select').value;
+
+            // Selected calibers
+            const selectedCalibers = Array.from(document.querySelectorAll('.caliber-checkbox:checked')).map(cb => cb.value);
+
+            let filtered = products.filter(p => {
+                if (currentCategory !== 'all' && p.category !== currentCategory) return false;
+                if (query && !p.title.toLowerCase().includes(query) && !p.caliber.toLowerCase().includes(query) && !p.brand.toLowerCase().includes(query)) return false;
+                if (p.price > maxPrice) return false;
+                if (brand !== 'all' && p.brand !== brand) return false;
+                if (licenseOnly && !p.requiresLicense) return false;
+                if (selectedCalibers.length > 0 && !selectedCalibers.some(c => p.caliber.includes(c))) return false;
+
+                return true;
+            });
+
+            if (sort === 'low') filtered.sort((a, b) => a.price - b.price);
+            if (sort === 'high') filtered.sort((a, b) => b.price - a.price);
+            if (sort === 'name') filtered.sort((a, b) => a.title.localeCompare(b.title));
+
+            renderProducts(filtered);
+        }
+
+        function filterCategory(cat, evt) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-tactical-gold', 'text-black');
+                btn.classList.add('text-gray-300');
+            });
+
+            if (evt && evt.target) {
+                const targetBtn = evt.target.closest('.cat-btn');
+                if (targetBtn) {
+                    targetBtn.classList.add('bg-tactical-gold', 'text-black');
+                    targetBtn.classList.remove('text-gray-300');
+                }
+            }
+            filterProducts();
+        }
+
+        function updatePriceLabel(val) {
+            document.getElementById('price-display').innerText = parseInt(val).toLocaleString() + ' сом';
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-input-mobile').value = '';
+            document.getElementById('price-range').value = 350000;
+            updatePriceLabel(350000);
+            document.getElementById('brand-select').value = 'all';
+            document.getElementById('license-only').checked = false;
+            document.querySelectorAll('.caliber-checkbox').forEach(cb => cb.checked = false);
+            currentCategory = 'all';
+            filterProducts();
+        }
+
+        // Product Modal Logic
+        function openProductModal(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+
+            const modalContent = document.getElementById('product-modal-content');
+            modalContent.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-black/60 rounded-lg overflow-hidden flex items-center justify-center p-2 border border-tactical-700">
+                        <img src="${p.image}" alt="${p.title}" class="max-h-72 object-contain">
+                    </div>
+                    <div class="space-y-4">
+                        <span class="bg-tactical-gold/20 text-tactical-gold border border-tactical-gold/40 text-[10px] font-bold px-2.5 py-1 rounded uppercase">
+                            ${p.brand} • ${p.caliber}
+                        </span>
+                        <h2 class="text-xl font-bold text-white leading-snug">${p.title}</h2>
+                        <p class="text-xs text-gray-300 leading-relaxed">${p.description}</p>
+                        
+                        <div class="border-t border-b border-tactical-700 py-3 my-2 space-y-1 text-xs">
+                            <h4 class="font-bold text-tactical-gold uppercase text-[11px]">Техникалык Мунөздөмөлөрү:</h4>
+                            ${Object.entries(p.specs).map(([key, val]) => `
+                                <div class="flex justify-between text-gray-300">
+                                    <span class="text-gray-500">${key}:</span>
+                                    <span class="font-semibold text-white">${val}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2">
+                            <div>
+                                <span class="text-[10px] text-gray-400 block uppercase">Баасы:</span>
+                                <span class="text-2xl font-black text-tactical-gold font-mono">${p.price.toLocaleString()} сом</span>
+                            </div>
+                            <button onclick="addToCart(${p.id}); closeProductModal();" class="bg-tactical-gold hover:bg-tactical-goldHover text-black font-bold px-5 py-2.5 rounded-lg text-xs uppercase tracking-wider shadow transition">
+                                <i class="fa-solid fa-cart-plus mr-1"></i> Брондоо
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('product-modal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        // Cart Drawer Logic
+        function addToCart(id) {
+            const p = products.find(x => x.id === id);
+            if (!p) return;
+            cart.push(p);
+            updateCartUI();
+            openCartDrawer();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            const container = document.getElementById('cart-items');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500 text-xs">
+                        <i class="fa-solid fa-shield-cat text-3xl mb-2 text-gray-600 block"></i>
+                        Себет азырынча бош.
+                    </div>
+                `;
+                document.getElementById('cart-total').innerText = '0 сом';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((p, idx) => {
+                total += p.price;
+                return `
+                    <div class="bg-tactical-900 border border-tactical-700 p-3 rounded-lg flex items-center justify-between gap-3 text-xs">
+                        <img src="${p.image}" class="w-12 h-12 object-cover rounded bg-black">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-white line-clamp-1">${p.title}</h4>
+                            <span class="text-tactical-gold font-mono text-xs font-bold">${p.price.toLocaleString()} сом</span>
+                        </div>
+                        <button onclick="removeFromCart(${idx})" class="text-gray-500 hover:text-tactical-red transition p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cart-total').innerText = total.toLocaleString() + ' сом';
+        }
+
+        function openCartDrawer() { document.getElementById('cart-drawer').classList.remove('hidden'); }
+        function closeCartDrawer() { document.getElementById('cart-drawer').classList.add('hidden'); }
+
+        // Checkout Modal
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showNotice("Себет бош", "Брондоо үчүн алгач каталогдон товар тандаңыз!", "fa-cart-shopping");
+                return;
+            }
+            closeCartDrawer();
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+       async function handleCheckout(e) {
+    e.preventDefault();
+    
+    // Формадан киргизилген маалыматтарды алуу
+    const fullName = e.target.querySelector('input[placeholder*="Асанов"]').value;
+    const phone = e.target.querySelector('input[type="tel"]').value;
+    const branch = e.target.querySelector('select').value;
+    const licenseNo = e.target.querySelector('input[placeholder*="ЛК-"]').value;
+
+    // Supabase 'reservations' базасына сактоо
+    const { error } = await _supabase.from('reservations').insert([
+        { 
+            full_name: fullName, 
+            phone: phone, 
+            branch: branch, 
+            license_number: licenseNo 
+        }
+    ]);
+
+    if (error) {
+        alert('Базага сактоодо ката чыкты: ' + error.message);
+        return;
+    }
+
+    const reservationNo = "#MRG-" + Math.floor(100000 + Math.random() * 900000);
+    showNotice(
+        "Брондоо кабыл алынды", 
+        `Рахмат! Сиздин брондоо кабыл алынды жана базага сакталды.\nБрондоо номери: ${reservationNo}`, 
+        "fa-circle-check",
+        function() {
+            cart = [];
+            updateCartUI();
+            closeCheckoutModal();
+        }
+    );
+}
+
+        // Interactive Game Finder Widget Logic
+        function toggleCaliberWidget() {
+            const widget = document.getElementById('caliber-widget');
+            widget.classList.toggle('hidden');
+        }
+
+        function selectGame(type) {
+            const rec = document.getElementById('game-recommendation');
+            rec.classList.remove('hidden');
+
+            let html = '';
+            if (type === 'goat') {
+                html = `
+                    <div class="text-tactical-gold font-bold mb-1"><i class="fa-solid fa-check-circle"></i> Сунушталган Калибр: .308 Win / 30-06 / .300 Win Mag</div>
+                    <p class="text-gray-300">Тоодо узак аралыкка (300м+) атуу үчүн жогорку ылдамдыктагы жана кубаттуу сайлуу курал зарыл. Оптика 12x+ чоңойтуучу болушу сунушталат.</p>
+                `;
+            } else if (type === 'boar') {
+                html = `
+                    <div class="text-tactical-gold font-bold mb-1"><i class="fa-solid fa-check-circle"></i> Сунушталган Калибр: 12/76 (Пуля) же 7.62x39 mm</div>
+                    <p class="text-gray-300">Токойдо же бадалда каманга каршы токтотуучу күчү жогору полуавтоматтык жылмакай куралдар же 7.62x39 карабиндери идеалдуу.</p>
+                `;
+            } else if (type === 'birds') {
+                html = `
+                    <div class="text-tactical-gold font-bold mb-1"><i class="fa-solid fa-check-circle"></i> Сунушталган Калибр: 12/76 же 16 калибр (Дробь №3-№7)</div>
+                    <p class="text-gray-300">Өрдөк жана кеклик уулоого жеңил, тез мээленүүчү полуавтомат же эки стволдуу жылмакай куралдар ылайыктуу.</p>
+                `;
+            } else if (type === 'predator') {
+                html = `
+                    <div class="text-tactical-gold font-bold mb-1"><i class="fa-solid fa-check-circle"></i> Сунушталган Калибр: .223 Rem (5.56x45) / 224 Valkyrie</div>
+                    <p class="text-gray-300">Түлкү жана бөрү уулоодо куйругу менен терисин бузбаган, ылдам атылуучу кичине калибрдеги натыйжалуу карабиндер.</p>
+                `;
+            }
+            rec.innerHTML = html;
+        }
+
+        function toggleMobileMenu() {
+            const nav = document.querySelector('nav');
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+        }
+    </script>
+</body>
+</html>

@@ -1132,81 +1132,19 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             nav.classList.toggle('hidden');
             nav.classList.toggle('flex');
             nav.classList.toggle('flex-col');
-        }
-        // Админ кирүү логикасы
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "mergen2026";
+  }
+</script>
 
-function openAdminAuth() {
-    document.getElementById('admin-modal').classList.remove('hidden');
-    document.getElementById('admin-modal').classList.add('flex');
-}
-
-function closeAdminModal() {
-    document.getElementById('admin-modal').classList.add('hidden');
-    document.getElementById('admin-modal').classList.remove('flex');
-}
-
-function checkAdminLogin() {
-    const user = document.getElementById('admin-user').value;
-    const pass = document.getElementById('admin-pass').value;
-
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        document.getElementById('admin-login-form').classList.add('hidden');
-        document.getElementById('admin-dashboard').classList.remove('hidden');
-        loadSiteReservations();
-    } else {
-        alert("Логин же сыр сөз ката!");
-    }
-}
-
-async function loadSiteReservations() {
-    const list = document.getElementById('site-reservations-list');
-    list.innerHTML = '<p class="text-gray-400 text-sm text-center">Жүктөлүүдө...</p>';
-
-    const { data, error } = await _supabase
-        .from('reservations')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        list.innerHTML = `<p class="text-red-400 text-sm text-center">Ката: ${error.message}</p>`;
-        return;
-    }
-
-    if (!data || data.length === 0) {
-        list.innerHTML = '<p class="text-gray-400 text-sm text-center">Брондоолор жок.</p>';
-        return;
-    }
-
-    list.innerHTML = '';
-    data.forEach(item => {
-        list.innerHTML += `
-            <div class="bg-gray-900 p-3 rounded border border-gray-700 text-xs space-y-1 text-left">
-                <div class="flex justify-between text-amber-400 font-bold">
-                    <span>${item.full_name || 'Аты жок'}</span>
-                    <span>${item.phone || ''}</span>
-                </div>
-                <div class="text-gray-300">Филиал: ${item.branch || '-'}</div>
-                <div class="text-gray-400">Лицензия: ${item.license_number || '-'}</div>
-                <div class="text-gray-500 text-[10px]">${new Date(item.created_at).toLocaleString('ky-HG')}</div>
-            </div>
-        `;
-    });
-}
-    </script>
-    <!-- АДМИН КИРҮҮ БАСКЫЧЫ ЖАНА МОДАЛДЫК ТЕРЕЗЕ -->
+<!-- 1. АДМИН КИРҮҮ БАСКЫЧЫ ЖАНА МОДАЛДЫК ТЕРЕЗЕ (Скрипттин СЫРТЫНА) -->
 <div class="text-center my-6">
-    <button onclick="openAdminAuth()" class="text-xs text-gray-500 hover:text-amber-500 underline">
+    <button onclick="openAdminAuth()" class="text-xs text-gray-500 hover:text-amber-500 underline cursor-pointer">
         🔑 Админ панелге кирүү
     </button>
 </div>
 
-<!-- Логин/Пароль киргизүүчү терезе -->
 <div id="admin-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center p-4 z-50">
     <div class="bg-gray-800 border border-amber-600 rounded-xl p-6 max-w-md w-full shadow-2xl relative">
         <button onclick="closeAdminModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white">✕</button>
-        
         <h2 class="text-xl font-bold text-amber-500 mb-4 text-center">🎯 Админ системасына кирүү</h2>
         
         <div id="admin-login-form" class="space-y-4">
@@ -1218,23 +1156,91 @@ async function loadSiteReservations() {
                 <label class="block text-sm text-gray-300 mb-1">Сыр сөз (Пароль):</label>
                 <input type="password" id="admin-pass" class="w-full bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none focus:border-amber-500">
             </div>
-            <button onclick="checkAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded">
+            <button onclick="checkAdminLogin()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded cursor-pointer">
                 Кирүү
             </button>
         </div>
 
-        <!-- Киргенден кийин көрүнүүчү Брондоолор тизмеси -->
         <div id="admin-dashboard" class="hidden space-y-4">
             <div class="flex justify-between items-center border-b border-gray-700 pb-2">
                 <span class="text-green-400 font-semibold text-sm">✓ Кирүү ийгиликтүү</span>
-                <button onclick="loadSiteReservations()" class="text-xs bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded">🔄 Жаңылоо</button>
+                <button onclick="loadSiteReservations()" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded">🔄 Жаңылоо</button>
             </div>
-            
             <div class="max-h-80 overflow-y-auto space-y-2" id="site-reservations-list">
                 <p class="text-gray-400 text-sm text-center">Жүктөлүүдө...</p>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 2. АДМИН ЛОГИКАСЫН 🛠 ӨЗҮНЧӨ СКТРИПТКЕ КОШОБУЗ -->
+<script>
+    const ADMIN_USER = "admin";
+    const ADMIN_PASS = "mergen2026";
+
+    function openAdminAuth() {
+        document.getElementById('admin-modal').classList.remove('hidden');
+        document.getElementById('admin-modal').classList.add('flex');
+    }
+
+    function closeAdminModal() {
+        document.getElementById('admin-modal').classList.add('hidden');
+        document.getElementById('admin-modal').classList.remove('flex');
+    }
+
+    function checkAdminLogin() {
+        const user = document.getElementById('admin-user').value;
+        const pass = document.getElementById('admin-pass').value;
+
+        if (user === ADMIN_USER && pass === ADMIN_PASS) {
+            document.getElementById('admin-login-form').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            loadSiteReservations();
+        } else {
+            alert("Логин же сыр сөз ката!");
+        }
+    }
+
+    async function loadSiteReservations() {
+        const list = document.getElementById('site-reservations-list');
+        list.innerHTML = '<p class="text-gray-400 text-sm text-center">Жүктөлүүдө...</p>';
+
+        if (typeof _supabase === 'undefined') {
+            list.innerHTML = '<p class="text-red-400 text-sm text-center">Supabase туташкан жок!</p>';
+            return;
+        }
+
+        const { data, error } = await _supabase
+            .from('reservations')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            list.innerHTML = `<p class="text-red-400 text-sm text-center">Ката: ${error.message}</p>`;
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            list.innerHTML = '<p class="text-gray-400 text-sm text-center">Брондоолор жок.</p>';
+            return;
+        }
+
+        list.innerHTML = '';
+        data.forEach(item => {
+            list.innerHTML += `
+                <div class="bg-gray-900 p-3 rounded border border-gray-700 text-xs space-y-1 text-left">
+                    <div class="flex justify-between text-amber-400 font-bold">
+                        <span>${item.full_name || 'Аты жок'}</span>
+                        <span>${item.phone || ''}</span>
+                    </div>
+                    <div class="text-gray-300">Филиал: ${item.branch || '-'}</div>
+                    <div class="text-gray-400">Лицензия: ${item.license_number || '-'}</div>
+                    <div class="text-gray-500 text-[10px]">${new Date(item.created_at).toLocaleString('ky-HG')}</div>
+                </div>
+            `;
+        });
+    }
+</script>
+
 </body>
 </html>

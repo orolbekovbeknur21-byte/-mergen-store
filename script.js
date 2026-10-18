@@ -116,7 +116,7 @@ const products = [
         caliber: "12/76",
         price: 2200,
         badge: "Аңчылык",
-        image: "https://cdn.kalashnikov.market/product-images/7321f277-627e-4fd6-a2e4-e1ec6644c2da",
+        image: "https://hft.ru/upload/thumbs/source/productimage/image/silvershot1270utka-36_60617a83e72f3.jpg",
         requiresLicense: true,
         description: "Өрдөк, кеклик жана коён уулоого арналган 12 калибрдеги сапаттуу патрондор.",
         specs: { "Дробь номери": "№3 (3.5 мм)", "На навеска": "32 грамм", "Таңгак": "25 даана" }
